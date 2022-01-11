@@ -102,7 +102,7 @@ jobs:
                 const reproURL = new URL(issueModel['repro-url']);
 
                 if (reproURL.protocol !== 'https:') {
-                  throw Error();
+                  throw Error(`Invalid protocol: ${reproURL.protocol}`);
                 }
 
                 switch(reproURL.hostname) {
@@ -124,14 +124,18 @@ jobs:
                       break;
                     }
                   default:
-                    throw new Error();
+                    throw new Error(`Invalid URL: ${reproURL}`);
                 }
 
                 labelsToAdd.push('bug/1-repro-available');
-              } catch {
+              } catch (error) {
+                console.error(error);
+
                 labelsToAdd.push('bug/0-needs-info');
               }
             }
+
+            console.log(templateType, issueModel['repro-url'], labelsToAdd);
 
             if (labelsToAdd.length > 0) {
               await github.rest.issues.addLabels({
